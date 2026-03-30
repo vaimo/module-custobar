@@ -10,6 +10,7 @@ class TrackingMode implements OptionSourceInterface
     public const MODE_NONE = 0;
     public const MODE_CUSTOM_SCRIPT = 1;
     public const MODE_GTM = 2;
+    public const MODE_CUSTOM_SCRIPT_V2 = 3;
 
     /**
      * @inheritDoc
@@ -37,8 +38,9 @@ class TrackingMode implements OptionSourceInterface
     {
         return [
             self::MODE_NONE => __('None'),
-            self::MODE_CUSTOM_SCRIPT => __('Custom Script'),
             self::MODE_GTM => __('Google Tag Manager'),
+            self::MODE_CUSTOM_SCRIPT_V2 => __('Custom Script v1'),
+            self::MODE_CUSTOM_SCRIPT => __('Custom Script v2)'),
         ];
     }
 }

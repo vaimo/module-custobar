@@ -32,7 +32,7 @@
                     <label>Tracking Script</label>
                     <comment>Paste your tracking script here</comment>
                     <depends>
-                        <field id="tracking_mode">1</field>
+                        <field id="tracking_mode" separator="|">1|3</field>
                     </depends>
                 </field>
                 <field id="allowed_websites" translate="label" type="multiselect" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
