@@ -289,4 +289,60 @@ class StatisticsTest extends AbstractController
             'Assert that GTM script is not added'
         );
     }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     *
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/allowed_websites 1
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/prefix prefixthatdoesntexists
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 3
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script
+     */
+    public function testCustomScriptV2NoTrackingScript()
+    {
+        $this->assertEmpty($this->statistics->getTrackingScript());
+
+        $this->dispatch('/');
+        $html = $this->getResponse()->getBody();
+
+        $this->assertFalse(
+            \str_contains($html, 'v1/custobar.js'),
+            'Assert that code is not present as its set to empty'
+        );
+        $this->assertFalse(
+            \str_contains($html, '<script async src>'),
+            'Assert that script is not present as its set to empty'
+        );
+        $this->assertFalse(
+            \str_contains($html, 'window.dataLayer.push(gtmData)'),
+            'Assert that GTM script is not added instead'
+        );
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     *
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/allowed_websites 1
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/prefix prefixthatdoesntexists
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 3
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script <script async src>
+     */
+    public function testCustomScriptV2TrackingScript()
+    {
+        $this->dispatch('/');
+        $html = $this->getResponse()->getBody();
+
+        $this->assertTrue(
+            \str_contains($html, '<script async src>'),
+            'Assert that code is not present as its set to empty'
+        );
+        $this->assertFalse(
+            \str_contains($html, '<script><script async src>'),
+            'Assert that script is not wrapped in another script tag'
+        );
+    }
 }
