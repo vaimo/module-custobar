@@ -10,7 +10,9 @@ use Custobar\CustoConnector\Model\Config\Source\TrackingMode;
     <?php if ($block->getTrackingMode() == TrackingMode::MODE_CUSTOM_SCRIPT): ?>
         <?= $block->getChildHtml('custom_script'); ?>
     <?php endif; ?>
-
+    <?php if ($block->getTrackingMode() == TrackingMode::MODE_CUSTOM_SCRIPT_V2): ?>
+        <?= $block->getChildHtml('custom_script_v2'); ?>
+    <?php endif; ?>
     <?php if ($block->getTrackingMode() == TrackingMode::MODE_GTM): ?>
         <?= $block->getChildHtml('gtm'); ?>
     <?php endif; ?>

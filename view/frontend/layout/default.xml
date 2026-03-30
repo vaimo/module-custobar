@@ -13,6 +13,11 @@
                            class="Custobar\CustoConnector\Block\Statistics\Config\Customer"
                            template="custoconnector/statistics/config/customer.phtml" />
                 </block>
+                <block name="custobar_statistics_custom_script_v2"
+                       as="custom_script_v2"
+                       class="Custobar\CustoConnector\Block\Statistics"
+                       template="custoconnector/statistics/custom-script-v2.phtml">
+                </block>
                 <block name="custobar_statistics_gtm"
                        as="gtm"
                        class="Custobar\CustoConnector\Block\Statistics\GTM"

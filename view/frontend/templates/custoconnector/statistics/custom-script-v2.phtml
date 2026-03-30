@@ -1,0 +1,11 @@
+<?php
+
+use Custobar\CustoConnector\Block\Statistics;
+
+/* @var Statistics $block */
+?>
+
+<?php $trackingScript = $block->getTrackingScript(); ?>
+<?php if ($trackingScript): ?>
+    <?= /* @noEscape */ $trackingScript; ?>
+<?php endif; ?>
