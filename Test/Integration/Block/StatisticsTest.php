@@ -87,6 +87,7 @@ class StatisticsTest extends AbstractController
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 1
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script v1/custobar.js
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script_v2 <script async src>
      */
     public function testCustomScriptNotLoggedIn()
     {
@@ -108,6 +109,10 @@ class StatisticsTest extends AbstractController
         $this->assertFalse(
             \str_contains($html, 'window.dataLayer.push(gtmData)'),
             'Assert that GTM script is not added instead'
+        );
+        $this->assertFalse(
+            \str_contains($html, '<script async src>'),
+            'Assert that V2 script is not added'
         );
     }
 
@@ -157,6 +162,7 @@ class StatisticsTest extends AbstractController
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 1
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script v1/custobar.js
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script_v2 <script async src>
      */
     public function testCustomScriptLoggedIn()
     {
@@ -185,6 +191,10 @@ class StatisticsTest extends AbstractController
         $this->assertTrue(
             \str_contains($html, 'cstbrConfig.productId = "simple_product_1";'),
             'Is cb.track_browse_product present'
+        );
+        $this->assertFalse(
+            \str_contains($html, '<script async src>'),
+            'Assert that V2 script is not added'
         );
     }
 
@@ -241,6 +251,7 @@ class StatisticsTest extends AbstractController
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 1
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script v1/custobar.js
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script_v2 <script async src>
      */
     public function testCustomScriptWebsiteNotAllowed()
     {
@@ -257,6 +268,10 @@ class StatisticsTest extends AbstractController
         $this->assertFalse(
             \str_contains($html, 'v1/custobar.js'),
             'Assert that custobar code is not present'
+        );
+        $this->assertFalse(
+            \str_contains($html, '<script async src>'),
+            'Assert that V2 script is not added'
         );
     }
 
@@ -298,7 +313,7 @@ class StatisticsTest extends AbstractController
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/prefix prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 3
-     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script_v2
      */
     public function testCustomScriptV2NoTrackingScript()
     {
@@ -329,16 +344,21 @@ class StatisticsTest extends AbstractController
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/prefix prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/apikey prefixthatdoesntexists
      * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_mode 3
-     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script <script async src>
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script v1/custobar.js
+     * @magentoConfigFixture default_store custobar/custobar_custoconnector/tracking_script_v2 <script async src>
      */
     public function testCustomScriptV2TrackingScript()
     {
         $this->dispatch('/');
         $html = $this->getResponse()->getBody();
 
+        $this->assertFalse(
+            \str_contains($html, 'v1/custobar.js'),
+            'Assert that V1 script is not added'
+        );
         $this->assertTrue(
             \str_contains($html, '<script async src>'),
-            'Assert that code is not present as its set to empty'
+            'Assert that V2 script is present'
         );
         $this->assertFalse(
             \str_contains($html, '<script><script async src>'),

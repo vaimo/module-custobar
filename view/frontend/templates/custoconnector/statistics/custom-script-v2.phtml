@@ -5,7 +5,7 @@ use Custobar\CustoConnector\Block\Statistics;
 /* @var Statistics $block */
 ?>
 
-<?php $trackingScript = $block->getTrackingScript(); ?>
+<?php $trackingScript = $block->getTrackingScriptV2(); ?>
 <?php if ($trackingScript): ?>
     <?= /* @noEscape */ $trackingScript; ?>
 <?php endif; ?>

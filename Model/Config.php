@@ -14,6 +14,7 @@ class Config
     public const CONFIG_MODE = self::CONFIG_BASE_ROOT . 'mode';
     public const CONFIG_TRACKING_MODE = self::CONFIG_BASE_ROOT . 'tracking_mode';
     public const CONFIG_TRACKING_SCRIPT = self::CONFIG_BASE_ROOT . 'tracking_script';
+    public const CONFIG_TRACKING_SCRIPT_V2 = self::CONFIG_BASE_ROOT . 'tracking_script_v2';
 
     public const CONFIG_MAPPING_ROOT = 'custobar/custoconnector_field_mapping/';
     public const CONFIG_MAPPING_PRODUCT = self::CONFIG_MAPPING_ROOT . 'product';
@@ -103,7 +104,7 @@ class Config
     }
 
     /**
-     * Get tracking script from config
+     * Get tracking script (v1) from config
      *
      * @return string
      */
@@ -111,6 +112,19 @@ class Config
     {
         return (string)$this->scopeConfig->getValue(
             self::CONFIG_TRACKING_SCRIPT,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get tracking script (v2) from config
+     *
+     * @return string
+     */
+    public function getTrackingScriptV2()
+    {
+        return (string)$this->scopeConfig->getValue(
+            self::CONFIG_TRACKING_SCRIPT_V2,
             ScopeInterface::SCOPE_STORE
         );
     }

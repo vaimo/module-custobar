@@ -37,13 +37,23 @@ class Statistics extends Template
     }
 
     /**
-     * Get tracking script from config
+     * Get tracking script (v1) from config
      *
      * @return string
      */
     public function getTrackingScript()
     {
         return $this->config->getTrackingScript();
+    }
+
+    /**
+     * Get tracking script (v2) from config
+     *
+     * @return string
+     */
+    public function getTrackingScriptV2()
+    {
+        return $this->config->getTrackingScriptV2();
     }
 
     /**
