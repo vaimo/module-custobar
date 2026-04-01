@@ -26,7 +26,7 @@ class AdjustFieldMappingFromConfig implements DataExtenderInterface
     /**
      * @inheritDoc
      */
-    public function extendData(MappingDataInterface $mappingData, int $storeId = null)
+    public function extendData(MappingDataInterface $mappingData, ?int $storeId = null)
     {
         $configPath = $mappingData->getFieldMapConfig();
         if (!$configPath) {

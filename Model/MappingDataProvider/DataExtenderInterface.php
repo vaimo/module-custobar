@@ -14,5 +14,5 @@ interface DataExtenderInterface
      *
      * @return MappingDataInterface
      */
-    public function extendData(MappingDataInterface $mappingData, int $storeId = null);
+    public function extendData(MappingDataInterface $mappingData, ?int $storeId = null);
 }
