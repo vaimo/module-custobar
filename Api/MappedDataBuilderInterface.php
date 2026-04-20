@@ -12,5 +12,5 @@ interface MappedDataBuilderInterface
      *
      * @return \Magento\Framework\DataObject
      */
-    public function buildMappedData($entity, int $storeId = null);
+    public function buildMappedData($entity, ?int $storeId = null);
 }

@@ -57,7 +57,7 @@ class MappingDataProvider implements MappingDataProviderInterface
     /**
      * @inheritDoc
      */
-    public function getAllMappingData(int $storeId = null)
+    public function getAllMappingData(?int $storeId = null)
     {
         if (!isset($this->cachedData[$storeId])) {
             $mappingModels = $this->resolveValidModels();
@@ -79,7 +79,7 @@ class MappingDataProvider implements MappingDataProviderInterface
     /**
      * @inheritDoc
      */
-    public function getMappingDataByEntityType(string $entityType, int $storeId = null)
+    public function getMappingDataByEntityType(string $entityType, ?int $storeId = null)
     {
         $models = $this->getAllMappingData($storeId);
 
@@ -89,7 +89,7 @@ class MappingDataProvider implements MappingDataProviderInterface
     /**
      * @inheritDoc
      */
-    public function getMappingDataByTargetField(string $targetField, int $storeId = null)
+    public function getMappingDataByTargetField(string $targetField, ?int $storeId = null)
     {
         $models = $this->getAllMappingData($storeId);
         foreach ($models as $model) {
@@ -104,7 +104,7 @@ class MappingDataProvider implements MappingDataProviderInterface
     /**
      * @inheritDoc
      */
-    public function getMappingDataByObject($entity, int $storeId = null)
+    public function getMappingDataByObject($entity, ?int $storeId = null)
     {
         $entityType = $this->typeResolver->resolveEntityType($entity);
 

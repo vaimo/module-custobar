@@ -42,7 +42,7 @@ class LaminasClientTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function doesVersionApplyDataProvider()
+    public static function doesVersionApplyDataProvider()
     {
         return [
             'Should return false on 2.4.4' => [

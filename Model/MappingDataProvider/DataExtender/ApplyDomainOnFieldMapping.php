@@ -35,7 +35,7 @@ class ApplyDomainOnFieldMapping implements DataExtenderInterface
     /**
      * @inheritDoc
      */
-    public function extendData(MappingDataInterface $mappingData, int $storeId = null)
+    public function extendData(MappingDataInterface $mappingData, ?int $storeId = null)
     {
         $domain = $this->config->getApiPrefix();
         $fieldMapping = $mappingData->getFieldMap() ?? [];

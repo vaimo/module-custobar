@@ -71,6 +71,17 @@ Magento crons run above the /pub folder so If you are running Magento frontend f
 
 
 ## Update notices
+### 4.0.0:
+- Support for Magento 2.4.8 and PHP 8.4. Installing still works on 2.4.4 and upwards
+
+### 3.0.0:
+- Dropped support for currently unsupported Magento versions, so as of July 2023 the oldest supported version is 2.4.4
+- Dropped InstallSchema and UpgradeSchema scripts and replaced these with the new declarative schema definition
+- Updated construction of cURL client (for Custobar API calls) to support 2.4.6 but also 2.4.4 and 2.4.5
+- Brought test definitions up to date so that they can be run in newer Magento test frameworks
+- Fixed several code sniffer related warnings to make sure that catching actual errors is easier
+- Fixed issue with order placement time not exporting with correct value to Custobar API
+- Fixed issue with sku resolving not always working in Commerce edition due to the row_id and entity_id differences
 
 ### 2.1.1:
 - Add compatibility with Magento 2.4.5 & PHP 8.1

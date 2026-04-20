@@ -62,7 +62,7 @@ class MappedDataBuilder implements MappedDataBuilderInterface
     /**
      * @inheritDoc
      */
-    public function buildMappedData($entity, int $storeId = null)
+    public function buildMappedData($entity, ?int $storeId = null)
     {
         $entityType = $this->identiferResolver->resolveEntityType($entity);
         if ($entityType == Product::ENTITY) {

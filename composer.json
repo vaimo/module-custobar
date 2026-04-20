@@ -2,7 +2,7 @@
     "name": "custobar/custobar_m2_custoconnector",
     "type": "magento2-module",
     "description": "Custobar magento connector",
-    "version": "2.1.1",
+    "version": "4.0.0",
     "homepage": "https://custobar.com/",
     "license": "MIT",
     "require": {

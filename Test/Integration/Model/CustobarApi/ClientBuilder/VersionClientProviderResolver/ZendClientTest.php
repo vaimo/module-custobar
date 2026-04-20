@@ -42,7 +42,7 @@ class ZendClientTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function doesVersionApplyDataProvider()
+    public static function doesVersionApplyDataProvider()
     {
         return [
             'Should return true on 2.4.4' => [

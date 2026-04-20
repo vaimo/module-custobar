@@ -18,6 +18,16 @@ use Magento\TestFramework\TestCase\AbstractBackendController;
 class CancelTest extends AbstractBackendController
 {
     /**
+     * @var string
+     */
+    protected $resource = 'Custobar_CustoConnector::status';
+
+    /**
+     * @var string
+     */
+    protected $uri = 'backend/custobar/status/cancel';
+
+    /**
      * @var ObjectManagerInterface
      */
     private $objectManager;
@@ -33,9 +43,6 @@ class CancelTest extends AbstractBackendController
      */
     protected function setUp(): void
     {
-        $this->resource = 'Custobar_CustoConnector::status';
-        $this->uri = 'backend/custobar/status/cancel';
-
         parent::setUp();
 
         $this->objectManager = Bootstrap::getObjectManager();
@@ -59,7 +66,7 @@ class CancelTest extends AbstractBackendController
 
         $this->getRequest()->setMethod(HttpRequest::METHOD_POST);
         $this->getRequest()->setPostValue(['identifier' => 'products']);
-        $this->dispatch('backend/custobar/status/cancel');
+        $this->dispatch($this->uri);
 
         $this->assertSessionMessages(
             $this->equalTo(['Successfully canceled all running exports']),
@@ -84,16 +91,11 @@ class CancelTest extends AbstractBackendController
 
         $this->getRequest()->setMethod(HttpRequest::METHOD_POST);
         $this->getRequest()->setPostValue(['identifier' => 'products']);
-        $this->dispatch('backend/custobar/status/cancel');
+        $this->dispatch($this->uri);
 
         $this->assertSessionMessages(
-            $this->equalTo([
-                \sprintf(
-                    'No initial found with id \'%s\'',
-                    \Magento\Catalog\Model\Product::class
-                ),
-            ]),
-            MessageInterface::TYPE_SUCCESS
+            $this->equalTo(['No exports to cancel']),
+            MessageInterface::TYPE_WARNING
         );
         $this->assertRedirect($this->stringContains('/backend/custobar/status/index'));
     }
@@ -110,11 +112,11 @@ class CancelTest extends AbstractBackendController
 
         $this->getRequest()->setMethod(HttpRequest::METHOD_POST);
         $this->getRequest()->setPostValue(['identifier' => 'unknown_type']);
-        $this->dispatch('backend/custobar/status/cancel');
+        $this->dispatch($this->uri);
 
         $this->assertSessionMessages(
-            $this->equalTo(['No initial found with id \'unknown_type\'']),
-            MessageInterface::TYPE_SUCCESS
+            $this->equalTo(['Cannot start export for unconfigured type &#039;unknown_type&#039;']),
+            MessageInterface::TYPE_ERROR
         );
         $this->assertRedirect($this->stringContains('/backend/custobar/status/index'));
     }
@@ -152,7 +154,7 @@ class CancelTest extends AbstractBackendController
 
         $this->getRequest()->setMethod(HttpRequest::METHOD_POST);
         $this->getRequest()->setPostValue(['identifier' => 'all']);
-        $this->dispatch('backend/custobar/status/cancel');
+        $this->dispatch($this->uri);
 
         $this->assertSessionMessages(
             $this->equalTo(['Successfully canceled all running exports']),
@@ -180,8 +182,12 @@ class CancelTest extends AbstractBackendController
 
         foreach ($allExpectedData as $entityType => $expectedData) {
             if (!\is_array($expectedData)) {
-                $this->expectException(NoSuchEntityException::class);
-                $this->initialRepository->getByEntityType($entityType);
+                try {
+                    $this->initialRepository->getByEntityType($entityType);
+                    $this->assertTrue(false, 'Should not find initial of type \'' . $entityType . '\'');
+                } catch (NoSuchEntityException $exception) {
+                    $this->assertTrue(true, 'Should not find initial of type \'' . $entityType . '\'');
+                }
 
                 continue;
             }
