@@ -9,7 +9,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Inventory\Model\ResourceModel\SourceItem\CollectionFactory;
 use Magento\InventoryApi\Api\Data\SourceItemInterface;
-use Magento\InventoryCatalog\Model\GetStockIdForByStoreId;
+use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
+use Magento\InventorySalesApi\Api\StockResolverInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class AddInventoryData implements CollectionProcessorInterface
 {
@@ -19,20 +21,28 @@ class AddInventoryData implements CollectionProcessorInterface
     private $collectionFactory;
 
     /**
-     * @var GetStockIdForByStoreId
+     * @var StoreManagerInterface
      */
-    private $stockIdProvider;
+    private $storeManager;
+
+    /**
+     * @var StockResolverInterface
+     */
+    private $stockResolver;
 
     /**
      * @param CollectionFactory $collectionFactory
-     * @param GetStockIdForByStoreId $stockIdProvider
+     * @param StoreManagerInterface $storeManager
+     * @param StockResolverInterface $stockResolver
      */
     public function __construct(
         CollectionFactory $collectionFactory,
-        GetStockIdForByStoreId $stockIdProvider
+        StoreManagerInterface $storeManager,
+        StockResolverInterface $stockResolver
     ) {
         $this->collectionFactory = $collectionFactory;
-        $this->stockIdProvider = $stockIdProvider;
+        $this->storeManager = $storeManager;
+        $this->stockResolver = $stockResolver;
     }
 
     /**
@@ -76,7 +86,10 @@ class AddInventoryData implements CollectionProcessorInterface
     {
         $skus = $collection->getColumnValues(ProductInterface::SKU);
         $storeId = (int) $collection->getStoreId();
-        $stockId = $this->stockIdProvider->execute($storeId);
+
+        $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
+        $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
+        $stockId = $this->stockResolver->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
 
         $collection = $this->collectionFactory->create()
             ->addFieldToFilter(SourceItemInterface::SKU, ['in' => $skus]);
