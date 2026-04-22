@@ -137,6 +137,7 @@
             <argument name="postProcessors" xsi:type="array">
                 <item name="add_category_data" xsi:type="object">Custobar\CustoConnector\Model\ResourceModel\Product\ProductProvider\CollectionPostProcessor\AddCategoryData</item>
                 <item name="add_url_rewrite_data" xsi:type="object">Custobar\CustoConnector\Model\ResourceModel\Product\ProductProvider\CollectionPostProcessor\AddUrlRewriteData</item>
+                <item name="add_inventory_data" xsi:type="object">Custobar\CustoConnector\Model\ResourceModel\Product\ProductProvider\CollectionPostProcessor\AddInventoryData</item>
             </argument>
         </arguments>
     </type>
@@ -185,6 +186,9 @@
                 <item name="target_field" xsi:type="string">products</item>
                 <item name="label" xsi:type="string" translatable="true">Products</item>
                 <item name="field_map_config" xsi:type="const">Custobar\CustoConnector\Model\Config::CONFIG_MAPPING_PRODUCT</item>
+                <item name="field_map" xsi:type="array">
+                    <item name="custobar_stock" xsi:type="string">stock</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -271,6 +275,7 @@
                 <item name="add_bundle_data" xsi:type="object">Custobar\CustoConnector\Model\MappedDataBuilder\DataExtender\CatalogProduct\AddBundleData</item>
                 <item name="add_configurable_data" xsi:type="object">Custobar\CustoConnector\Model\MappedDataBuilder\DataExtender\CatalogProduct\AddConfigurableData</item>
                 <item name="add_grouped_data" xsi:type="object">Custobar\CustoConnector\Model\MappedDataBuilder\DataExtender\CatalogProduct\AddGroupedData</item>
+                <item name="add_inventory_data" xsi:type="object">Custobar\CustoConnector\Model\MappedDataBuilder\DataExtender\CatalogProduct\AddInventoryData</item>
             </argument>
         </arguments>
     </virtualType>

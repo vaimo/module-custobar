@@ -117,6 +117,92 @@ class MappedDataBuilderTest extends TestCase
     }
 
     /**
+     * @dataProvider buildMappedDataProductWithStocksDataProvider
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation disabled
+     * @magentoDataFixture Magento_InventoryApi::Test/_files/products.php
+     * @magentoDataFixture Magento_InventoryApi::Test/_files/sources.php
+     * @magentoDataFixture Magento_InventoryApi::Test/_files/stocks.php
+     * @magentoDataFixture Magento_InventoryApi::Test/_files/stock_source_links.php
+     * @magentoDataFixture Magento_InventoryApi::Test/_files/source_items.php
+     * @magentoDataFixture Magento_InventorySalesApi::Test/_files/websites_with_stores.php
+     * @magentoDataFixture Magento_InventorySalesApi::Test/_files/stock_website_sales_channels.php
+     * @magentoDataFixture Magento_InventoryIndexer::Test/_files/reindex_inventory.php
+     */
+    public function testBuildMappedDataProductWithStocks(string $storeCode, array $expectedStocks)
+    {
+        $skus = \array_keys($expectedStocks);
+        $productIds = \array_map(function ($sku) {
+            return $this->productRepository->get($sku)->getId();
+        }, $skus);
+
+        $mappedData = [];
+        $productDataItems = $this->entityDataResolver->resolveEntities(
+            Product::class,
+            $productIds,
+            $this->storeManager->getStore($storeCode)->getId()
+        );
+        foreach ($productDataItems as $productDataItem) {
+            $mappedData[$productDataItem->getSku()] = $this->mappedDataBuilder->buildMappedData($productDataItem);
+        }
+
+        $mappedStockData = \array_map(function ($mappedData) {
+            return $mappedData->getData('stock');
+        }, $mappedData);
+
+        $this->assertEquals($expectedStocks, $mappedStockData);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function buildMappedDataProductWithStocksDataProvider()
+    {
+        return [
+            'should set only stocks on products based on \'store_for_eu_website\'' => [
+                'store_for_eu_website',
+                [
+                    'SKU-1' => [
+                        ['shop_id' => 'eu-1', 'quantity' => 5.5],
+                        ['shop_id' => 'eu-2', 'quantity' => 3],
+                        ['shop_id' => 'eu-3', 'quantity' => 0],
+                    ],
+                    'SKU-2' => [],
+                    'SKU-3' => [
+                        ['shop_id' => 'eu-2', 'quantity' => 0],
+                    ],
+                ],
+            ],
+            'should set only stocks on products based on \'store_for_us_website\'' => [
+                'store_for_us_website',
+                [
+                    'SKU-1' => [],
+                    'SKU-2' => [
+                        ['shop_id' => 'us-1', 'quantity' => 5.0],
+                    ],
+                    'SKU-3' => [],
+                ],
+            ],
+            'should set only stocks on products based on \'store_for_global_website\'' => [
+                'store_for_global_website',
+                [
+                    'SKU-1' => [
+                        ['shop_id' => 'eu-1', 'quantity' => 5.5],
+                        ['shop_id' => 'eu-2', 'quantity' => 3],
+                        ['shop_id' => 'eu-3', 'quantity' => 0],
+                    ],
+                    'SKU-2' => [
+                        ['shop_id' => 'us-1', 'quantity' => 5.0],
+                    ],
+                    'SKU-3' => [
+                        ['shop_id' => 'eu-2', 'quantity' => 0],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
      *
