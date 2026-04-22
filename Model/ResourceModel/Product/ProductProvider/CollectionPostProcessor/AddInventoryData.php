@@ -4,13 +4,11 @@ namespace Custobar\CustoConnector\Model\ResourceModel\Product\ProductProvider\Co
 
 use Custobar\CustoConnector\Model\ResourceModel\Product\ProductProvider\CollectionProcessorInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Inventory\Model\ResourceModel\SourceItem\CollectionFactory;
 use Magento\InventoryApi\Api\Data\SourceItemInterface;
-use Magento\InventoryApi\Api\Data\StockSourceLinkInterface;
-use Magento\InventoryApi\Api\GetStockSourceLinksInterface;
 use Magento\InventoryCatalog\Model\GetStockIdForByStoreId;
 
 class AddInventoryData implements CollectionProcessorInterface
@@ -26,31 +24,15 @@ class AddInventoryData implements CollectionProcessorInterface
     private $stockIdProvider;
 
     /**
-     * @var GetStockSourceLinksInterface
-     */
-    private $getStockSourceLinks;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $criteriaBuilder;
-
-    /**
      * @param CollectionFactory $collectionFactory
      * @param GetStockIdForByStoreId $stockIdProvider
-     * @param GetStockSourceLinksInterface $getStockSourceLinks
-     * @param SearchCriteriaBuilder $criteriaBuilder
      */
     public function __construct(
         CollectionFactory $collectionFactory,
-        GetStockIdForByStoreId $stockIdProvider,
-        GetStockSourceLinksInterface $getStockSourceLinks,
-        SearchCriteriaBuilder $criteriaBuilder
+        GetStockIdForByStoreId $stockIdProvider
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->stockIdProvider = $stockIdProvider;
-        $this->getStockSourceLinks = $getStockSourceLinks;
-        $this->criteriaBuilder = $criteriaBuilder;
     }
 
     /**
@@ -58,14 +40,7 @@ class AddInventoryData implements CollectionProcessorInterface
      */
     public function execute($collection)
     {
-        $skus = $collection->getColumnValues(ProductInterface::SKU);
-        $storeId = (int) $collection->getStoreId();
-        $sourceCodes = $this->getSourceCodesByStoreId($storeId);
-
-        /** @var SourceItemInterface[] $sourceItems */
-        $sourceItems = $this->collectionFactory->create()
-            ->addFieldToFilter(SourceItemInterface::SKU, ['in' => $skus])
-            ->addFieldToFilter(SourceItemInterface::SOURCE_CODE, ['in' => $sourceCodes]);
+        $sourceItems = $this->getSourceItemsByProductCollection($collection);
         foreach ($sourceItems as $sourceItem) {
             $sku = $sourceItem->getSku();
             $product = $collection->getItemByColumnValue(ProductInterface::SKU, $sku);
@@ -89,25 +64,34 @@ class AddInventoryData implements CollectionProcessorInterface
     }
 
     /**
-     * Resolves array of source code strings by store - stock links
+     * Based on given collection, retrieves only the relevant source item data for the products
      *
-     * @param int $storeId
+     * @param Collection $collection
      *
-     * @return string[]
+     * @return SourceItemInterface[]
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function getSourceCodesByStoreId(int $storeId)
+    private function getSourceItemsByProductCollection($collection)
     {
+        $skus = $collection->getColumnValues(ProductInterface::SKU);
+        $storeId = (int) $collection->getStoreId();
         $stockId = $this->stockIdProvider->execute($storeId);
 
-        $searchCriteria = $this->criteriaBuilder
-            ->addFilter(StockSourceLinkInterface::STOCK_ID, $stockId)
-            ->create();
-        $sourceLinks = $this->getStockSourceLinks->execute($searchCriteria);
+        $collection = $this->collectionFactory->create()
+            ->addFieldToFilter(SourceItemInterface::SKU, ['in' => $skus]);
+        $collection->getSelect()
+            ->joinInner(
+                ['issl' => 'inventory_source_stock_link'],
+                'issl.source_code = main_table.source_code and issl.stock_id = ' . $stockId,
+                []
+            )
+            ->joinInner(
+                ['is' => 'inventory_source'],
+                'issl.source_code = is.source_code and is.enabled = 1',
+                []
+            );
 
-        return \array_map(function ($sourceLink) {
-            return (string) $sourceLink->getSourceCode();
-        }, $sourceLinks->getItems());
+        return $collection->getItems();
     }
 }
